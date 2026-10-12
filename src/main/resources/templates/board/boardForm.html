@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 작성</title>
+</head>
+<body style="background-color:#d3d3d3; text-align:center; padding-top:40px; font-family:굴림, Gulim, sans-serif;">
+
+<!-- 공통 헤더 프래그먼트 삽입 -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+
+    <div style="width:640px; margin:0 auto;">
+
+        <!-- 비로그인(익명) 사용자에게만 로그인/회원가입 링크 노출 -->
+        <div style="text-align:right; padding-bottom:10px;">
+            <div th:if="${#authorization.expression('isAnonymous()')}">
+                <a th:href="@{/member/login}"
+                   style="color:blue; font-weight:bold; font-size:0.9em; text-decoration:none;">[ 로그인 ]</a>
+                <a th:href="@{/member/new}"
+                   style="color:blue; font-weight:bold; font-size:0.9em; text-decoration:none;">[ 회원가입 ]</a>
+            </div>
+
+
+            <p>★ 글을 게시하시려면 아래 양식을 빈칸 없이 채워주세요!! ★</p>
+
+            <!--
+               - th:action="@{/board/new}" : 전송 경로 지정
+               - th:object="${boardDto}" : 컨트롤러가 넘겨준 폼 백킹 객체 바인딩
+               - enctype=multipart/form-data": 파일 업로드를 위한 필수 인코딩 방식
+            -->
+            <form th:action="@{/board/new}" th:object="${boardDto}"
+                  method="post" enctype="multipart/form-data">
+
+                <!-- CSRF 공격 방어를 위한 보안 토큰 전달 -->
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
+                <table border="1"
+                       style="width:600px; margin:0 auto; border-collapse:collapse;
+                    background-color:#f2f2f2; border:2px solid #888;">
+
+                    <!-- 제목 입력 영역 -->
+                    <tr>
+                        <td style="width:20%; padding:10px; font-weight:bold;">제목</td>
+                        <td style="background-color:white; padding:5px;">
+                            <!-- th:field="*{title}": id="title", name="title", value="" 자동 생성 및 매핑 -->
+                            <input type="text" th:field="*{title}" style="width:98%; border:1px solid #ccc;">
+                        </td>
+                    </tr>
+                    <tr th:if="${#fields.hasErrors('title')}">
+                        <td colspan="2" style="background-color: white; padding: 5px; text-align: left;">
+                            <div th:errors="*{title}" style="color:red; font-size:0.8em; padding-left: 10px;"></div>
+                        </td>
+                    </tr>
+
+                    <!-- 내용 입력 영역 -->
+                    <tr>
+                        <td style="padding:10px; font-weight:bold;">내용</td>
+                        <td style="background-color:white; padding:5px;">
+                        <!-- th:field="*{content}": DTO의 content 필드와 양방향 바인딩 -->
+                        <textarea th:field="*{content}" rows="12"
+                                  style="width:98%; border:1px solid #ccc;"></textarea>
+                        </td>
+                    </tr>
+                    <!-- 내용 유효성 검증 실패 시 에러 메세지 출력 -->
+                    <tr th:if="${#fields.hasErrors('content')}">
+                        <td colspan="2" style="background-color: white; padding: 5px; text-align: left;">
+                            <div th:errors="*{content}" style="color:red; font-size:0.8em; padding-left: 10px;"></div>
+                        </td>
+                    </tr>
+
+                    <!-- 사용자가 게시글에 첨부할 파일을 선택하는 부분 -->
+                    <tr>
+                        <td style="padding:10px; font-weight:bold;">첨부파일</td>
+                        <td style="background-color:white; padding:5px; text-align:left;">
+                            <!-- 선택한 첨부파일을 BoardDto의 file 필드로 전달 -->
+                            <input type="file" name="file">
+                        </td>
+                    </tr>
+
+                    <!-- 버튼 영역 : 권한 상태에 따른 동적 분기 처리 -->
+                    <tr style="background-color:#eee;">
+                        <td colspan="2" style="padding:10px; text-align:center;">
+                            <!-- 로그인 인증된 회원 : 등록 및 리셋 버튼 활성화 -->
+                            <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+                                <button type="submit" style="padding:3px 15px; font-weight:bold; cursor:pointer;">
+                                    [ 등록하기 ]
+                                </button>
+                                <button type="reset" style="padding:3px 15px; font-weight:bold; cursor:pointer;">
+                                    [ 다시쓰기 ]
+                                </button>
+                            </th:block>
+
+                            <!-- 비로그인 상태: 로그인 안내 및 이동 버튼 처리-->
+                            <th:block th:if="${#authorization.expression('isAnonymous()')}">
+                                <button type="button"
+                                        th:onclick="|location.href='@{/member/login}'|"
+                                        style="padding:3px 15px; cursor:pointer; color:#555;">
+                                    로그인 후 이용 가능합니다
+                                </button>
+                            </th:block>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+
+            <!-- 비로그인 사용자 경고 문구 -->
+            <p th:if="${#authorization.expression('isAnonymous()')}"
+               style="color:red; font-size:0.9em; font-weight:bold;">
+                * 등록은 로그인 후 가능합니다.
+            </p>
+
+            <hr style="width:600px; margin:30px auto 10px;">
+            <p style="font-size:0.8em; color:#666;">
+                Copyright © 1998 게시판 All Rights Reserved.
+            </p>
+
+        </div>
+</main>
+
+<!-- 공통 푸터 프래그먼트 삽입 -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

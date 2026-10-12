@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>목록</title>
+</head>
+
+<body bgcolor="#C0C0C0" text="black" link="blue" vlink="purple" alink="red">
+<center>
+
+    <!-- 공통 헤더 프래그먼트 삽입 -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <br>
+
+    <table border="4" cellpadding="10" cellspacing="3"
+           bgcolor="#E0E0E0" bordercolorlight="white" bordercolordark="gray" width="850">
+        <tr>
+            <td align="center" bgcolor="#000080">
+                <font size="6" color="white"><b>★ 게시판 ★</b></font>
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <marquee behavior="alternate" scrollamount="5" width="600">
+                    <font color="red"><b>관리자 전용 목록입니다!!</b></font>
+                </marquee>
+            </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <div align="center" style="margin:20px 0;">
+
+        <!-- 게시글 작성 화면으로 이동 -->
+        <a th:href="@{/board/new}" style="
+           display:inline-block;
+           width:120px;
+           padding:10px 0;
+           background:#000080;
+           color:white;
+           text-decoration:none;
+           font-weight:bold;
+           border-top:2px solid white;
+           border-left:2px solid white;
+           border-right:2px solid gray;
+           border-bottom:2px solid gray;
+           font-size:16px;">
+            ✏ 글쓰기
+        </a></div>
+
+    <!-- 검색어를 GET 방식으로 /board/list에 전달 -->
+    <form th:action="@{/board/list}" method="get">
+        <table border="0" width="850">
+            <tr>
+                <td align="right">
+                    <!-- Controller 에서 전달받은 기존 검색어를 검색어 창에 다시 표시 -->
+                    <input type="text" name="search" th:value="${search}" placeholder="검색어 입력..." style="padding:4px;">
+                    <input type="submit" value="검색" style="padding:4px 10px; font-weight:bold;">
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <table border="3" cellpadding="7" cellspacing="2"
+           bgcolor="#FFFFCC" bordercolorlight="white" bordercolordark="gray" width="850">
+
+        <tr bgcolor="#808080">
+            <th width="60"><font color="white">번호</font></th>
+            <th><font color="white">제목</font></th>
+            <th width="100"><font color="white">작성자</font></th>
+            <th width="120"><font color="white">작성일</font></th>
+            <th width="80"><font color="white">상세보기</font></th>
+        </tr>
+
+        <!-- 조회된 게시글이 없는 경우 안내 메세지 출력 -->
+        <tr th:if="${paging.isEmpty()}" bgcolor="#FFFFFF">
+            <td colspan="5" align="center" height="100">
+                <font color="gray">등록된 내역이 없습니다.</font>
+            </td>
+        </tr>
+
+        <!-- 현재 페이지의 게시글 목록을 반복하여 출력 -->
+        <tr th:each="board : ${paging.content}" bgcolor="#FFFFFF">
+
+            <!-- 게시글 번호/id -->
+            <td align="center" th:text="${board.id}"></td>
+
+            <!-- 게시글 제목 -->
+            <td th:text="${board.title}"></td>
+
+            <!-- 게시글 작성자 이름 -->
+            <td align="center" th:text="${board.member.name}"></td>
+
+            <!-- 게시글 작성일 -->
+            <td align="center" th:text="${#temporals.format(board.regTime, 'yyyy-MM-dd')}"></td>
+
+            <!-- 게시글 id를 이용하여 상세 화면을로 이동 -->
+            <td align="center">
+                <a th:href="@{/board/detail/{id}(id=${board.id})}">
+                    <font color="blue"><b>[상세]</b></font>
+                </a>
+            </td>
+        </tr>
+
+        <tr bgcolor="#E0E0E0">
+            <td colspan="5" align="center" style="padding: 10px 0;">
+                <font size="3">
+
+                    <!-- 현재 페이지가 첫 페이지가 아닐 때만 [처음] 링크를 표시
+                     클릭하면 page=0을 전달하여 첫 번째 페이지로 이동
+                     검색 중이었다면 search 값도 같이 전달하여 검색 조건 유지 -->
+                    <a th:if="${!paging.first}"
+                       th:href="@{/board/list(page=0, search=${search})}">【처음】</a>
+
+                    <!-- 현재 페이지보다 앞에 페이지가 존재할 때만 [이전] 링크를 표시
+                     paging.number는 현재 페이지 번호이며 Spring에서는 0부터 시작
+                     현재 페이지 번호에서 -1하여 바로 이전 페이지로 이동
+                     예: 현재 paging.number가 3이면 page=2로 이동 -->
+                    <a th:if="${paging.hasPrevious()}"
+                       th:href="@{/board/list(page=${paging.number - 1}, search=${search})}">[이전]</a>
+
+                    <!-- 게시글 페이지가 1개 이상 존재하는 경우 페이지 번호 영역을 표시
+
+                     start : 화면에 표시할 시작 페이지 번호
+                             현재 페이지에서 2를 뺀 값과 0 중 큰 값을 선택
+                             → 페이지 번호가 0보다 작아지는 것을 방지
+
+                     end : 화면에 표시할 마지막 페이지 번호
+                           현재 페이지에서 2를 더한 값과 실제 마지막 페이지 번호 중 작은 값을 선택
+                           → 실제 존재하는 마지막 페이지를 넘어가는 것을 방지
+
+                     결과적으로 현재 페이지를 기준으로 앞뒤 최대 2 페이지까지 표시 -->
+                    <span th:if="${paging.totalPages > 0}"
+                          th:with="start=${T(java.lang.Math).max(0, paging.number - 2)},
+                                   end=${T(java.lang.Math).min(paging.totalPages - 1, paging.number + 2)}">
+
+                         <!-- 위에서 계산한 start부터 end까지 페이지 번호를 하나씩 반복
+                         예: start=2, end=6이면 내부적으로 2,3,4,5,6을 반복 -->
+                        <span th:each="page : ${#numbers.sequence(start, end)}">
+
+                            <!-- 반복 중인 page가 현재 페이지가 아닌 경우 클릭 가능한 링크로 표시
+
+                             page=${page}
+                             → 클릭한 페이지 번호를 Controller의 page 파라미터로 전달
+
+                             search=${search}
+                             → 검색 중이라면 기존 검색어도 같이 전달하여 검색 결과 유지
+
+                             page + 1
+                             → Spring 페이지 번호는 0부터 시작하지만
+                               사용자 화면에서는 1부터 보여주기 위해 +1 -->
+                            <a th:if="${page != paging.number}"
+                               th:href="@{/board/list(page=${page}, search=${search})}"
+                               th:text="${page + 1}" style="text-decoration: none; margin: 0 5px;"></a>
+
+                            <!-- 반복 중인 page가 현재 보고 있는 페이지라면
+                             이동 링크를 만들지 않고 굵은 글씨로 현재 페이지 번호를 표시
+
+                             예: 현재 화면이 Spring 기준 page=2라면
+                                 사용자에게는 3페이지로 표시 -->
+                            <b th:if="${page == paging.number}"
+                               th:text="${page + 1}" style="color: red; margin: 0 5px; font-size: 1.1em;"></b>
+                        </span>
+                    </span>
+
+                    <!-- 다음 페이지가 존재하는 경우 다음 페이지 링크 표시 -->
+                    <a th:if="${paging.hasNext()}"
+                       th:href="@{/board/list(page=${paging.number + 1}, search=${search})}">[다음]</a>
+
+                    <!-- 마지막 페이지가 아닌 경우 마지막 페이지 이동 링크 표시 -->
+                    <a th:if="${!paging.last}"
+                       th:href="@{/board/list(page=${paging.totalPages - 1}, search=${search})}">【끝】</a>
+
+                </font>
+            </td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <table border="2" cellpadding="5" cellspacing="1"
+           bgcolor="#E0E0E0" bordercolorlight="white" bordercolordark="gray" width="850">
+        <tr>
+            <td align="center">
+                <font size="2" color="gray">
+                    since 1998 · ADMIN BOARD
+                </font>
+            </td>
+        </tr>
+    </table>
+
+</center>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

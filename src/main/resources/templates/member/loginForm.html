@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+
+    <style>
+
+        body{
+            background-color:#008080;
+            font-family:gulim, 돋움, sans-serif;
+            font-size:14px;
+        }
+
+        .login-box{
+            width:350px;
+            margin:120px auto;
+            background:#C0C0C0;
+            border:2px solid black;
+        }
+
+        .title{
+            background:navy;
+            color:white;
+            padding:8px;
+            font-weight:bold;
+        }
+
+        .content{
+            padding:20px;
+        }
+
+        input{
+            width:95%;
+            padding:5px;
+            border:2px inset #999;
+            margin-bottom:10px;
+        }
+
+        .btn{
+            width:100%;
+            padding:6px;
+            background:#E0E0E0;
+            border:2px outset white;
+            font-weight:bold;
+            cursor:pointer;
+        }
+
+        .btn:active{
+            border:2px inset gray;
+        }
+
+        .join{
+            text-align:center;
+            margin-top:15px;
+        }
+
+        a{
+            color:blue;
+            text-decoration:underline;
+        }
+
+        .footer{
+            text-align:center;
+            margin-top:10px;
+            font-size:12px;
+            color:white;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div class="login-box">
+
+    <div class="title">
+        로그인
+    </div>
+
+    <div class="content">
+
+        <form th:action="@{/member/login}" method="post">
+            <div th:if="${loginError}"
+                 style="background:#FFFFCC; border:2px inset red; color:red; padding:8px; margin-bottom:10px; font-weight:bold;">
+                ※ <span th:text="${loginError}"></span>
+            </div>
+            이메일<br>
+            <input type="email" name="email" placeholder="이메일 입력">
+
+            비밀번호<br>
+            <input type="password" name="password" placeholder="비밀번호 입력">
+
+            <button type="submit" class="btn">
+                LOGIN
+            </button>
+
+        </form>
+
+        <div class="join">
+            <a href="/member/new">
+                회원가입
+            </a>
+        </div>
+
+        <div class="findEmail">
+            <a th:href="@{/member/findEmail}">
+                이메일 찾기
+            </a>
+        </div>
+
+        <div class="findPassword">
+            <a th:href="@{/member/findPassword}">
+                비밀번호 찾기
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="footer">
+    Copyright 1998 YK Corporation
+</div>
+
+</body>
+</html>

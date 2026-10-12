@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>회원정보 수정</title>
+
+    <style>
+
+        body{
+            background:#C0C0C0;
+            font-family:굴림,Gulim,sans-serif;
+            font-size:12px;
+            margin:0;
+        }
+
+        .main{
+
+            width:550px;
+            margin:40px auto;
+
+            border:2px solid black;
+            background:#E0E0E0;
+        }
+
+        .title{
+
+            background:navy;
+            color:white;
+
+            padding:8px;
+            font-weight:bold;
+            font-size:14px;
+        }
+
+        table{
+
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        td{
+
+            border:1px solid gray;
+            padding:8px;
+        }
+
+        .label{
+
+            width:130px;
+            background:#B0C4DE;
+            font-weight:bold;
+        }
+
+        input{
+
+            width:95%;
+            padding:4px;
+            font-family:굴림;
+            border:2px inset white;
+            background:white;
+        }
+
+        .error{
+
+            color:red;
+            font-size:11px;
+            margin-top:3px;
+        }
+
+        .bottom{
+
+            text-align:center;
+            padding:15px;
+        }
+
+        .btn{
+
+            width:90px;
+            height:28px;
+
+            font-family:굴림;
+            font-weight:bold;
+
+            border:2px outset white;
+
+            background:#DCDCDC;
+
+            cursor:pointer;
+        }
+
+        .btn:active{
+
+            border:2px inset white;
+        }
+
+        .footer{
+
+            text-align:center;
+            background:#DCDCDC;
+            border-top:1px solid gray;
+            padding:5px;
+            font-size:11px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="main">
+
+    <div class="title">
+        ■ 회원 정보 수정
+    </div>
+
+    <form th:action="@{/member/update}" th:object="${memberFormDto}" method="post">
+
+        <table>
+
+            <tr>
+
+                <td class="label">
+                    이메일
+                </td>
+
+                <td>
+
+                    <input type="email" th:field="*{email}" readonly>
+
+                    <p class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
+                    </p>
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td class="label">
+                    이름
+                </td>
+
+                <td>
+
+                    <input type="text"
+                           th:field="*{name}">
+
+                    <p class="error"
+                       th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
+                    </p>
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td class="label">
+                    전화번호
+                </td>
+
+                <td>
+
+                    <input type="text" th:field="*{phone}">
+
+                    <p class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">
+                    </p>
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td class="label">
+                    비밀번호
+                </td>
+
+                <td>
+
+                    <input type="password" th:field="*{password}">
+
+                    <p class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">
+                    </p>
+
+                </td>
+
+            </tr>
+
+        </table>
+
+        <div class="bottom">
+
+            <button class="btn" type="submit">
+                수정
+            </button>
+
+            <button class="btn" type="button" onclick="history.back()">
+                취소
+            </button>
+
+        </div>
+
+    </form>
+
+    <div class="footer">
+        Copyright ⓒ 1998 My Homepage
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.5'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com'
+version = '0.0.1-SNAPSHOT'
+description = 'consult'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+// Spring Boot Starters (중복 제거)
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // Thymeleaf Dialects
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.3.0'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+    // Lombok (테스트 영역까지 포함)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    // JPA Model Gen
+    annotationProcessor 'org.hibernate.orm:hibernate-jpamodelgen'
+
+    // Database & 쿼리 로그 (P6Spy 버전 업그레이드)
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    // 중요: Spring Boot 3.x / Java 17~21 이상에서는 p6spy 버전을 1.9.0 이상으로 올려야 에러가 안 납니다.
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1'
+
+    // Test 환경 (H2 중복 정리)
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'com.h2database:h2' // runtimeOnly와 중복되던 것을 하나로 통일
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

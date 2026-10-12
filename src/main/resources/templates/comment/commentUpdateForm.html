@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>댓글 수정</title>
+</head>
+<body>
+
+<!-- 수정할 댓글 ID를 URL에 포함하여 POST 방식으로 Controller에 전달
+    입력값은 commentDto와 연결 -->
+<form th:action="@{/comment/update/{id}(id=${comment.id})}" th:object="${commentDto}" method="post">
+
+    <!-- 기존 댓글 내용을 표시하고 CommentDto의 comment 필드와 연결 -->
+    <textarea th:field="*{content}" rows="5" cols="50"></textarea><br>
+
+    <!-- 댓글 내용의 유효성 검증 실패 시 오류 메시지 출력 -->
+    <span th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></span>
+
+    <!-- 수정된 댓글 내용을 서버로 전송 -->
+    <input type="submit" value="수정">
+</form>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>::: 이메일 찾기 결과 :::</title>
+    <style>
+        body { background-color: #c0c0c0; font-family: 'Gulim', '굴림', sans-serif; font-size: 9pt; }
+        .title-bar { background: linear-gradient(to right, #000080, #1084d0); color: white; font-weight: bold; padding: 2px 5px; }
+        .result-box { background-color: #fff; border: 2px solid; border-color: #808080 #fff #fff #808080; padding: 10px; margin: 10px 0; font-size: 10pt; }
+        a { color: #0000ff; text-decoration: underline; }
+        a:hover { color: #ff0000; }
+    </style>
+</head>
+<body>
+<center>
+    <br><br>
+    <table border="2" cellspacing="0" cellpadding="0" width="380" style="border-color: #fff #808080 #808080 #fff;">
+        <tr>
+            <td class="title-bar">📢 시스템 알림</td>
+        </tr>
+        <tr>
+            <td style="padding: 20px;" align="center">
+                <img src="https://img.icons8.com/color/48/000000/info--v1.png" width="32" height="32" valign="middle">
+                <b style="font-size: 11pt;">이메일 검색 결과입니다.</b>
+                <br><br>
+
+                <div th:if="${email != null}" class="result-box">
+                    조회된 이메일: <b th:text="${email}" style="color: #000080;">example@domain.com</b>
+                </div>
+                <div th:unless="${email != null}" class="result-box" style="color: red;">
+                    일치하는 회원 정보가 없습니다.
+                </div>
+
+                <br>
+                <font color="#808080">----------------------------------------</font>
+                <br><br>
+                [ <a th:href="@{/member/login}">로그인 화면으로 이동</a> ]
+            </td>
+        </tr>
+    </table>
+</center>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 상세</title>
+
+    <style>
+        body {
+            margin: 0;
+            background-color: #f4f6f8;
+            font-family: Arial, "Malgun Gothic", sans-serif;
+            color: #333;
+        }
+
+        .container {
+            width: 900px;
+            margin: 40px auto;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #222;
+        }
+
+        .detail-row {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            padding: 14px 0;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            width: 120px;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .detail-value {
+            flex: 1;
+        }
+
+        .content-box {
+            white-space: pre-line;
+            line-height: 1.7;
+        }
+
+        .button-area {
+            margin-top: 25px;
+            text-align: right;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 9px 16px;
+            border-radius: 6px;
+            border: none;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: 6px;
+        }
+
+        .btn-list {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-edit {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-submit {
+            background-color: #198754;
+            color: white;
+        }
+
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            resize: vertical;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .error {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .section-title {
+            font-size: 21px;
+            font-weight: bold;
+            margin-bottom: 18px;
+        }
+
+        .comment-item {
+            border-bottom: 1px solid #eee;
+            padding: 18px 0;
+        }
+
+        .comment-item:last-child {
+            border-bottom: none;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .comment-writer {
+            font-weight: bold;
+        }
+
+        .comment-date {
+            font-size: 13px;
+            color: #777;
+        }
+
+        .comment-content {
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .comment-actions a {
+            font-size: 13px;
+            color: #0d6efd;
+            text-decoration: none;
+            margin-right: 8px;
+        }
+
+        .reply-form {
+            margin-top: 12px;
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .reply-item {
+            margin-top: 12px;
+            margin-left: 30px;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #0d6efd;
+            border-radius: 8px;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #777;
+            padding: 30px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- 게시글 상세 -->
+    <div class="card">
+        <div class="page-title">게시글 상세</div>
+
+        <!-- 글 번호 출력 -->
+        <div class="detail-row">
+            <div class="detail-label">번호</div>
+            <div class="detail-value" th:text="${board.id}">1</div>
+        </div>
+
+        <!-- 작성자 출력 (Board -> Member 연관관계 탐색) -->
+        <div class="detail-row">
+            <div class="detail-label">작성자</div>
+            <div class="detail-value" th:text="${board.member.name}">홍길동</div>
+        </div>
+
+        <!-- 글 제목 출력 -->
+        <div class="detail-row">
+            <div class="detail-label">제목</div>
+            <div class="detail-value" th:text="${board.title}">제목</div>
+        </div>
+
+        <!-- 글 내용 출력 -->
+        <div class="detail-row">
+            <div class="detail-label">내용</div>
+            <div class="detail-value content-box" th:text="${board.content}">내용</div>
+        </div>
+
+        <!-- 글 나용 출력 -->
+        <div class="detail-row">
+            <div class="detail-label">조회수</div>
+            <div class="detail-value" th:text="${board.viewCount}">0</div>
+        </div>
+
+        <!-- [수정 후] -->
+        <!-- 서버에 저장된 첨부파일명이 있을 때만 링크를 표시함 -->
+        <div class="detail-row" th:if="${board.storedFileName != null}">
+            <div class="detail-label">첨부파일</div>
+            <div class="detail-value">
+                <!-- 클릭하면 /board/download/게시글번호 주소로 요청함. 예: 게시글 번호가 10이면 /board/download/10 -->
+                <a th:href="@{/board/download/{id}(id=${board.id})}"
+                   th:text="${board.originalFileName}"
+                   style="color: #0d6efd; text-decoration: underline;">
+                    첨부파일 다운로드
+                </a>
+            </div>
+        </div>
+
+        <!-- 게시글 제어 버튼 영역 -->
+        <div class="button-area">
+            <a class="btn btn-list" th:href="@{/board/list}">목록</a>
+            <a class="btn btn-edit" th:href="@{/board/{id}/update(id=${board.id})}">수정</a>
+
+            <!-- 삭제는 데이터 변형을 수반하므로 POST 전송 처리-->
+            <form th:action="@{/board/{id}/delete(id=${board.id})}" method="post" style="display:inline;">
+                <input class="btn btn-delete" type="submit" value="삭제"
+                       onclick="return confirm('정말 삭제하시겠습니까?');">
+            </form>
+        </div>
+    </div>
+
+    <!-- 원 댓글 작성 영역-->
+    <div class="card">
+        <div class="section-title">댓글 작성</div>
+
+        <!--POST 방식으로  현재 게시글의 ID를 URL에 포함하여 댓글 등록 요청
+             입력 값은 commentDto와 연결 -->
+        <form th:action="@{/comment/save/board/{id}(id=${board.id})}"
+              th:object="${commentDto}" method="post">
+
+            <!-- commentDto의 content 필드와 연결 -->
+            <textarea th:field="*{content}" rows="4" placeholder="댓글을 입력하세요"></textarea>
+
+            <!-- 댓글 내용 유효성 검증 실패 시 오류 메세지 출력 -->
+            <div class="error">
+                <span th:if="${#fields.hasErrors('content')}"
+                      th:errors="*{content}">댓글 오류</span>
+            </div>
+
+            <div class="button-area">
+                <input class="btn btn-submit" type="submit" value="댓글 등록">
+            </div>
+        </form>
+    </div>
+
+    <!-- 댓글 목록 -->
+    <div class="card">
+        <div class="section-title">댓글 목록</div>
+
+        <!-- 뎃글 목록이 비어있을 경우 안내 문구 출력 -->
+        <th:block th:if="${#lists.isEmpty(commentList)}">
+            <div class="empty-message">
+                등록된 댓글이 없습니다.
+            </div>
+        </th:block>
+
+        <!-- 원댓글 목록을 하나씩 반복하여 출력 (자바의 for-each 문과 비슷한 역할) -->
+        <th:block th:each="comment : ${commentList}">
+
+            <div class="comment-item">
+                <div class="comment-header"> <!-- 댓글 작성자 -->
+                    <span class="comment-writer" th:text="${comment.member.name}">작성자</span>
+                    <!-- 댓글 작성 날짜와 시간 -->
+                    <span class="comment-date"
+                          th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}">
+                        작성일
+                    </span>
+                </div>
+
+                <div class="comment-content" th:text="${comment.content}">
+                    댓글 내용
+                </div>
+
+                <div class="comment-actions">
+                    <a th:href="@{/comment/update/{id}(id=${comment.id})}">수정</a>
+                    <a th:href="@{/comment/delete/{id}(id=${comment.id})}"
+                       onclick="return confirm('댓글을 삭제하시겠습니까?');">삭제</a>
+                </div>
+
+
+                <!-- 현재 원댓글에 대한 대댓글 작성
+                  여기서는 comment가 원댓글이랑 연결되어있음-->
+                <form class="reply-form"
+                      th:action="@{/comment/reply/{parentId}(parentId=${comment.id})}" method="post">
+
+                    <!-- 어떤 게시글의 댓글인지 전달 -->
+                    <input type="hidden" name="boardId" th:value="${board.id}">
+
+                    <textarea name="content" rows="2" placeholder="대댓글을 입력하세요"></textarea>
+
+                    <div class="button-area">
+                        <input class="btn btn-submit" type="submit" value="대댓글 등록">
+                    </div>
+                </form>
+
+                <!-- 현재 원댓글에 달린 대댓글(children)을 반복 출력
+                 여기서는 comment가 원댓글이랑 연결되어있음 -->
+                <div class="reply-item" th:each="reply : ${comment.children}">
+                    <div class="comment-header">
+                        <span class="comment-writer" th:text="${reply.member.name}">작성자</span>
+                        <span class="comment-date"
+                              th:text="${#temporals.format(reply.createDate,'yyyy-MM-dd HH:mm')}">
+                            작성일
+                        </span>
+                    </div>
+
+                    <div class="comment-content" th:text="${reply.content}">
+                        대댓글 내용
+                    </div>
+                </div>
+            </div>
+
+        </th:block>
+    </div>
+
+</div>
+
+</body>
+</html>

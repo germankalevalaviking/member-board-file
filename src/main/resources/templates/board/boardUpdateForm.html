@@ -1,0 +1,43 @@
+<!--
+    게시글 수정 폼
+     - boardId : 수정할 게시글의 id
+     - boardDto : 기존 게시글의 제목/내용이 담긴 객체
+     - 수정된 데이터를 POST 방식으로 /board/{id}/update에 전달
+-->
+<form th:action="@{/board/{id}/update(id=${boardId})}" th:object="${boardDto}" method="post">
+
+    <table border="2" cellpadding="8" cellspacing="2" bgcolor="#E0E0E0">
+
+        <!-- 기존 제목을 표시하고 BoardDto의 title 필드와 연결 -->
+        <tr>
+            <td bgcolor="#B0C4DE"><b>제목</b></td>
+            <td>
+                <input type="text" th:field="*{title}" size="35">
+                <p style="color:red; font-size:12px;"
+                   th:if="${#fields.hasErrors('title')}"
+                   th:errors="*{title}"></p>
+            </td>
+        </tr>
+
+        <!-- 기존 내용을 표시하고 BoardDto의 content 필드와 연결 -->
+        <tr>
+            <td bgcolor="#B0C4DE"><b>내용</b></td>
+            <td>
+                <textarea th:field="*{content}" rows="10" cols="35" style="resize:vertical;"></textarea>
+
+                <!-- 내용 유효성 검증 실패 시 오류 메세지 출력 -->
+                <p style="color:red; font-size:12px;"
+                   th:if="${#fields.hasErrors('content')}"
+                   th:errors="*{content}"></p>
+            </td>
+        </tr>
+
+        <!-- 수정된 내용을 서버로 전송 -->
+        <tr>
+        <td colspan="2" align="center">
+            <input type="submit" value="수정하기" style="width:120px; height:30px; font-weight:bold;">
+        </td>
+        </tr>
+    </table>
+
+</form>
